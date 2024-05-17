@@ -128,7 +128,7 @@ void error_process(char **p, FILE *fp, int end)
     {
         all_free(p, end);
     }
-    strerror(errno);
+    fprintf(stderr, "%s\n", strerror(errno));
     fclose(fp);
     exit(1);
 }
