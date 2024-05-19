@@ -4,12 +4,14 @@
 #include <string.h>
 #include <errno.h>
 
-#define LINESIZE 512
+#define DEFAULTLINES 128 /* デフォルトの行数 */
+#define LINESIZE 512     /* 1行の文字数は十分な大きさにしておく */
 
 void out_sort_asc(FILE *);
 void sort(char **, int);
 void swap(char *, char *);
 void output(char **, int);
+void *xmalloc(void *, int);
 void all_free(char **, int);
 void error_process(char **, FILE *, int);
 
@@ -43,50 +45,43 @@ int main(int argc, char *argv[])
 
 void out_sort_asc(FILE *fp)
 {
-    char **p;
-    char **tmp;
-    int i = 0; /* インデックス */
-    int n = 1; /* 行数 */
+    char **p = NULL;
+    char **tmp = NULL;
+    int i; /* インデックス */
+    int n; /* 行数 */
 
-    p = (char **)malloc(sizeof(char *) * n);
-    if (p == NULL)
+    for (i = 0, n = 0;;)
     {
-        /* 全て開放して終了 */
-        error_process(NULL, fp, 0);
-    }
-    n++;
-
-    p[i] = (char *)malloc(sizeof(char) * LINESIZE);
-    if (p[i] == NULL)
-    {
-        /* 全て開放して終了 */
-        error_process(p, fp, 0);
-    }
-
-    while (fgets(p[i], LINESIZE, fp) != NULL)
-    {
-        tmp = (char **)realloc(p, sizeof(char *) * n);
-        if (tmp == NULL)
+        /* 行が足りなければ領域を拡張 */
+        if (i == DEFAULTLINES * n)
         {
-            /* 全て開放して終了 */
-            error_process(p, fp, i + 1);
+            n++;
+            tmp = (char **)xmalloc(p, sizeof(char *) * DEFAULTLINES * n);
+            if (tmp == NULL)
+            {
+                error_process(p, fp, DEFAULTLINES * n);
+            }
+            p = tmp;
         }
-        p = tmp;
-        i++;
-        n++;
 
-        p[i] = (char *)malloc(sizeof(char) * LINESIZE);
+        /* 1行の文字数の領域を確保 */
+        p[i] = (char *)xmalloc(NULL, sizeof(char) * LINESIZE);
         if (p[i] == NULL)
         {
-            /* 全て開放して終了 */
-            error_process(p, fp, i);
+            error_process(p, fp, DEFAULTLINES * n);
         }
 
-        /* ソート（長さ順、辞書順） */
-        sort(p, i - 1);
+        /* ファイルを最後まで読み込んだらループを抜ける */
+        if (fgets(p[i], LINESIZE, fp) == NULL)
+        {
+            break;
+        }
+
+        sort(p, i);
+
+        i++;
     }
 
-    /* ソート済み表示 */
     output(p, i);
 
     /* 全て開放して終了 */
@@ -147,6 +142,22 @@ void output(char **p, int end)
     }
 
     return;
+}
+
+void *xmalloc(void *ptr, int size)
+{
+    void *p;
+
+    if (ptr ==  NULL)
+    {
+        p = malloc(size);
+    }
+    else
+    {
+        p = realloc(ptr, size);
+    }
+
+    return p;
 }
 
 void all_free(char **p, int end)

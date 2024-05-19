@@ -5,10 +5,11 @@
 #include <errno.h>
 
 #define LINESIZE 512    /* 1行のサイズは十分な大きさにしておく */ 
-#define DEFAULTLINES 64 /* デフォルトの行数 */
+#define DEFAULTLINES 128 /* デフォルトの行数 */
 
-void read_file(FILE *);
-void reverse_out(char **, int);
+void out_reverse(FILE *);
+void *xmalloc(void *, int);
+void output_reverse(char **, int);
 void all_free(char **, int);
 void error_process(char **, FILE *, int);
 
@@ -29,7 +30,7 @@ int main(int argc, char *argv[])
         exit(1);
     }
 
-    read_file(fp);
+    out_reverse(fp);
 
     if (fclose(fp) == EOF)
     {
@@ -40,64 +41,69 @@ int main(int argc, char *argv[])
     return 0;
 }
 
-void read_file(FILE *fp)
+void out_reverse(FILE *fp)
 {
-    char **p;
-    char **tmp;
+    char **p = NULL;
+    char **tmp = NULL;
     int i;
     int n;
 
-    p = (char **)malloc(sizeof(char *) * DEFAULTLINES);
-    if (p == NULL)
+    for (i = 0, n = 0;;)
     {
-        error_process(NULL, fp, 0); 
-    }
-	
-    for (i = 0, n = 1;; i++)
-    {
-        /* 行数が足りなければ拡張する */
+        /* 行が足りなくなったら拡張 */
         if (i == DEFAULTLINES * n)
         {
             n++;
-            tmp = (char **)realloc(p, sizeof(char *) * DEFAULTLINES * n);
-            /* メモリの拡張に失敗したら全開放して終了 */
+            tmp = (char **)xmalloc(p, sizeof(char *) * DEFAULTLINES * n);
             if (tmp == NULL)
             {
-                error_process(p, fp, i - 1);
+                /* 全開放して終了 */
+                error_process(p, fp, DEFAULTLINES * n);
             }
-
             p = tmp;
         }
 
-        p[i] = (char *)malloc(sizeof(char) * LINESIZE);
-        /* メモリの確保に失敗したら全開放して終了 */
+        p[i] = (char *)xmalloc(NULL, sizeof(char) * LINESIZE);
         if (p[i] == NULL)
-        {	
-            error_process(p, fp, i);
+        {
+            /* 全開放して終了 */
+            error_process(p, fp, DEFAULTLINES * n);
         }
 
         if (fgets(p[i], LINESIZE, fp) == NULL)
         {
-            /* バッファへの読み込みに失敗したら全開放して終了 */
-            if (ferror(fp))
-            {
-                error_process(p, fp, i + 1);
-            }
-
-            /* ファイルを最後まで読み込んだのでループを抜ける */
             break;
         }
+
+        i++;
     }
 
     /* 逆順に表示 */
-    reverse_out(p, i);
+    output_reverse(p, i);
 
+    /* 全開放 */
     all_free(p, DEFAULTLINES * n);
 
     return;
 }
 
-void reverse_out(char **p, int end)
+void *xmalloc(void *ptr, int size)
+{
+    void *p;
+
+    if (ptr == NULL)
+    {
+        p = malloc(size);
+    }
+    else
+    {
+        p = realloc(ptr, size);
+    }
+
+    return p;
+}
+
+void output_reverse(char **p, int end)
 {
     int i;
 

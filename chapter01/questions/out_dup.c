@@ -6,7 +6,8 @@
 
 #define LINESIZE 512 /* 1行のサイズは十分な大きさにしておく */
 
-void read_file(FILE *);
+void out_dup(FILE *);
+void *xmalloc(void *, int);
 void all_free(char **, int);
 void error_process(char **, FILE *, int);
 int is_duplicate(char **, char *, int);
@@ -28,8 +29,7 @@ int main(int argc, char *argv[])
         exit(1);
     }
 
-    /* 重複している行を出力 */
-    read_file(fp);
+    out_dup(fp);
 
     if (fclose(fp) == EOF)
     {
@@ -40,60 +40,70 @@ int main(int argc, char *argv[])
     return 0;
 }
 
-void read_file(FILE *fp)
+void out_dup(FILE *fp)
 {
-    char **p;
-    char **tmp;
-    int i = 0; /* インデックス */
-    int n = 1; /* 行数 */
+    char **p = NULL;
+    char **tmp = NULL;
+    int i; /* インデックス */
+    int n; /* 行数 */
 
-    /* 最初の1行分を確保 */
-    p = (char **)malloc(sizeof(char *) * n);
-    if (p == NULL)
+    for (i = 0, n = 0;;)
     {
-        /* 失敗したら全開放して終了 */
-        error_process(NULL, fp, 0);
-    }
-    n++;
+        if (i == n)
+        {
+            /* 行の領域の確保 */
+            n++;
+            tmp = (char **)xmalloc(p, sizeof(char *) * n);
+            if (tmp == NULL)
+            {
+                error_process(tmp, fp, n);
+            }
+            p = tmp;
+        }
 
-    p[i] = (char *)malloc(sizeof(char) * LINESIZE);
-    if (p[i] == NULL)
-    {
-        /* 失敗したら全開放して終了 */
-        error_process(p, fp, 0);
-    }
+        /* 1行の文字数の領域の確保 */
+        p[i] = (char *)xmalloc(NULL, sizeof(char) * LINESIZE);
+        if (p[i] == NULL)
+        {
+            error_process(p, fp, n);
+        }
 
-    while (fgets(p[i], LINESIZE, fp) != NULL)
-    {
-        /* 重複しているなら表示するだけ */
+        /* ファイルを最後まで読み込んだらループを抜ける */
+        if (fgets(p[i], LINESIZE, fp) == NULL)
+        {
+            break;
+        }
+
         if (is_duplicate(p, p[i], i))
         {
+            /* 行が重複していたら表示して次の行は確保済みの領域に読み込む */
             printf("%s", p[i]);
             continue;
         }
 
-        tmp = (char **)realloc(p, sizeof(char *) * n);
-        if (tmp == NULL)
-        {
-            /* 失敗したら全開放して終了 */
-            error_process(p, fp, i + 1);
-        }
-        p = tmp;
         i++;
-        n++;
-
-        p[i] = (char *)malloc(sizeof(char) * LINESIZE);
-        if (p[i] == NULL)
-        {
-            /* 失敗したら全開放して終了 */
-            error_process(p, fp, i);
-        }
     }
 
-    /* 全開放して終了 */
-    all_free(p, i + 1);
+    /* 全開放 */
+    all_free(p, n);
 
     return;
+}
+
+void *xmalloc(void *ptr, int size)
+{
+    void *p;
+
+    if (ptr == NULL)
+    {
+        p = malloc(size);
+    }
+    else
+    {
+        p = realloc(ptr, size);
+    }
+
+    return p;
 }
 
 void all_free(char **p, int end)
