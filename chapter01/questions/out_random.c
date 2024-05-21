@@ -101,7 +101,7 @@ void output_random(char **p, int n, int max)
     {
         /* 乱数をmaxで割った余りの値をインデックスとして交換する*/
         j = rand() % max;
-        k = rand() & max;
+        k = rand() % max;
         if (j == k)
         {
             /* 同じインデックスは交換しない */
