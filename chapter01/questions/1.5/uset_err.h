@@ -1,5 +1,5 @@
-#ifndef USET_H
-#define USET_H
+#ifndef USET_ERR_H
+#define USET_ERR_H
 
 #define MAX_STRING_SIZE 32
 

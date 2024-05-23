@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include "uset.h"
+#include "uset_err.h"
 
 int main(int argc, char *argv[])
 {

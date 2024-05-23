@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "uset.h"
+#include "uset_err.h"
 
 #define TRUE 1
 #define FALSE 0
