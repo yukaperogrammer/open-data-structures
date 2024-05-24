@@ -27,7 +27,7 @@ bagのサイズ（要素数）を返す。
 */
 int bag_size(bag *bagp)
 {
-    return bagp->interface.num_of_node;
+    return uset_size(&bagp->interface);
 }
 
 /*
