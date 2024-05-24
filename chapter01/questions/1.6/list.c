@@ -98,7 +98,6 @@ int list_add(list *listp, int offset, char *value)
     {
         /* 先頭以外に追加 */
         prev->next = new;
-        new->next = current;
     }
 
     /* ノードが1つ増えたのでサイズを増やす */
