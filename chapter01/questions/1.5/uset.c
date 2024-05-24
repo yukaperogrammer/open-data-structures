@@ -24,6 +24,26 @@ void uset_init(uset *usetp)
     return;
 }
 
+/*
+usetを全て開放する。
+*/
+void uset_all_free(uset *usetp)
+{
+    uset_node *current, *next;
+    int i;
+
+    for (i = 0; i < TABLE_SIZE; i++)
+    {
+        for (current = usetp->hashtable[i], next = NULL; current != NULL; current = next)
+        {
+            next = current->next;
+            free(current);
+        }
+    }
+
+    return;
+}
+
 /* usetのサイズ（要素の数）を返す。 */
 int uset_size(uset *usetp)
 {
@@ -180,25 +200,8 @@ void *xmalloc(void *ptr, int size)
 }
 
 /*
-usetを全て開放する。
+usetの要素を表示する。
 */
-void uset_all_free(uset *usetp)
-{
-    uset_node *current, *next;
-    int i;
-
-    for (i = 0; i < TABLE_SIZE; i++)
-    {
-        for (current = usetp->hashtable[i], next = NULL; current != NULL; current = next)
-        {
-            next = current->next;
-            free(current);
-        }
-    }
-
-    return;
-}
-
 void uset_show_elements(uset *usetp)
 {
     uset_node *current;

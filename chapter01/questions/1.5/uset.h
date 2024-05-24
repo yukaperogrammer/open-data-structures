@@ -14,13 +14,13 @@ typedef struct uset {
 } uset;
 
 void uset_init(uset *);
+void uset_all_free(uset *);
 int uset_size(uset *);
 int uset_add(uset *, char *);
 char *uset_remove(uset *, char *);
 char *uset_find(uset *, char *);
 unsigned int hash(char *);
 void *xmalloc(void *, int); 
-void uset_all_free(uset *);
 void uset_show_elements(uset *);
 
 #endif
