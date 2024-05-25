@@ -159,12 +159,15 @@ void list_show(list *listp)
 
 void list_free(list *listp)
 {
+    int i;
     int max_offset;
 
-    for (max_offset = listp->num_of_node - 1; max_offset >= 0; max_offset--)
+    max_offset = listp->num_of_node;
+
+    for (i = 0; i < max_offset; i++)
     {
-        /* 末尾から順に開放 */
-        list_remove(listp, max_offset);
+        /* 先頭から順に開放 */
+        list_remove(listp, 0);
     }
 }
 
