@@ -20,7 +20,8 @@ int array_queue_init(array_queue *aq, int length)
         return FALSE;
     }
 
-    aq->array = (char **)xmalloc(NULL, sizeof(char *) * length);
+    /* リングバッファが1周したときのダミー用で+1 */
+    aq->array = (char **)xmalloc(NULL, sizeof(char *) * (length + 1));
     if (aq->array == NULL)
     {
         /* メモリの確保失敗はFALSE */
