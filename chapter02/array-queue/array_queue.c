@@ -20,8 +20,7 @@ int array_queue_init(array_queue *aq, int length)
         return FALSE;
     }
 
-    /* リングバッファが1周したときのダミー用で+1 */
-    aq->array = (char **)xmalloc(NULL, sizeof(char *) * (length + 1));
+    aq->array = (char **)xmalloc(NULL, sizeof(char *) * length);
     if (aq->array == NULL)
     {
         /* メモリの確保失敗はFALSE */
@@ -35,8 +34,7 @@ int array_queue_init(array_queue *aq, int length)
         aq->array[i] = NULL;
     }
 
-    /* リングバッファが1周したときのダミー用で+1 */
-    aq->length = length + 1;
+    aq->length = length;
     aq->head = 0;
     aq->tail = 0;
     aq->num_of_element = 0;
@@ -133,8 +131,7 @@ array queueがいっぱいかどうか調べる。
 */
 int is_full(array_queue *aq)
 {
-    /* ダミー用の領域はカウントしないので-1 */
-    if (aq->num_of_element == aq->length - 1)
+    if (aq->num_of_element == aq->length)
     {
         return TRUE;
     }
@@ -155,9 +152,9 @@ void array_queue_show(array_queue *aq)
         printf("array queue is empty\n");
     }
 
-    for (i = aq->head; i != aq->tail; i = (i + 1) % aq->length)
+    for (i = 0; i < aq->num_of_element; i++)
     {
-        printf("element: %s\n", aq->array[i]);
+        printf("element: %s\n", aq->array[(aq->head + i) % aq->length]);
     }
     printf("\n");
 }
