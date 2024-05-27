@@ -3,7 +3,7 @@
 
 typedef struct array_queue {
     char **array;       /* リングバッファとして使う */
-    int length;         /* 配列の大きさ（リングバッファが1周したときに head != tail となるように+1しておく） */
+    int length;         /* 配列の大きさ */
     int head;           /* 先頭のインデックス */
     int tail;           /* 末尾のインデックス */
     int num_of_element; /* 配列に格納されている要素の個数 */
