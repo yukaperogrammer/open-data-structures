@@ -66,9 +66,12 @@ int array_queue_add(array_queue *aq, char *element)
 {
     if (is_full(aq))
     {
-        /* 配列がいっぱいで追加できないのでFALSE */
-        fprintf(stderr, "array queue is full\n");
-        return FALSE;
+        if (array_queue_resize(aq) == FALSE)
+        {
+            /* リサイズに失敗し、追加できないのでFALSE */
+            fprintf(stderr, "memory is not extend\n");
+            return FALSE;
+        }
     }
 
     /* 末尾に追加 */
@@ -107,6 +110,11 @@ char *array_queue_remove(array_queue *aq)
     aq->head = (aq->head + 1) % aq->length;
 
     aq->num_of_element--;
+
+    if (3 * aq->num_of_element <= aq->length)
+    {
+        array_queue_resize(aq);
+    }
 
     return element;
 }
@@ -157,6 +165,43 @@ void array_queue_show(array_queue *aq)
         printf("element: %s\n", aq->array[(aq->head + i) % aq->length]);
     }
     printf("\n");
+}
+
+/*
+配列のサイズを拡張or収縮
+*/
+int array_queue_resize(array_queue *aq)
+{
+    char **tmp;
+    int size;
+    int i;
+
+    /* すぐにremoveしてしまうと配列の大きさが0になってしまうので、最低でも1つの領域は確保 */
+    size = (2 * aq->num_of_element) ? (2 * aq->num_of_element) : 1;
+
+    tmp = (char **)xmalloc(NULL, size);
+    if (tmp == NULL)
+    {
+        return FALSE;
+    }
+
+    for (i = 0; i < aq->num_of_element; i++)
+    {
+        tmp[i] = aq->array[(aq->head + i) % aq->length];
+    }
+    aq->length = size;
+
+    /* コピーしたので古いメモリは解放 */
+    array_queue_free(aq);
+
+    /* 新たな配列を設定 */
+    aq->array = tmp;
+
+    /* 先頭と末尾のインデックスを再設定 */
+    aq->head = 0;
+    aq->tail = aq->num_of_element;
+
+    return TRUE;
 }
 
 /*

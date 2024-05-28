@@ -17,6 +17,7 @@ char *array_queue_remove(array_queue *);
 int is_empty(array_queue *);
 int is_full(array_queue *);
 void array_queue_show(array_queue *);
+int array_queue_resize(array_queue *);
 void *xmalloc(void *, int);
 
 #endif

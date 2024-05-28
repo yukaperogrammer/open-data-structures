@@ -21,6 +21,7 @@ int main(int argc, char *argv[])
     printf("add f\n");
     array_queue_add(&aq, "f");
     printf("array queue size = %d\n", array_queue_size(&aq));
+    printf("array queue length = %d\n", aq.length);
     array_queue_show(&aq);
 
     printf("remove\n");
@@ -28,6 +29,7 @@ int main(int argc, char *argv[])
     printf("remove\n");
     array_queue_remove(&aq);
     printf("array queue size = %d\n", array_queue_size(&aq));
+    printf("array queue length = %d\n", aq.length);
     array_queue_show(&aq);
 
     printf("add A\n");
@@ -43,6 +45,7 @@ int main(int argc, char *argv[])
     printf("add F\n");
     array_queue_add(&aq, "F");
     printf("array queue size = %d\n", array_queue_size(&aq));
+    printf("array queue length = %d\n", aq.length);
     array_queue_show(&aq);
 
     printf("remove\n");
@@ -50,6 +53,7 @@ int main(int argc, char *argv[])
     printf("remove\n");
     array_queue_remove(&aq);
     printf("array queue size = %d\n", array_queue_size(&aq));
+    printf("array queue length = %d\n", aq.length);
     array_queue_show(&aq);
 
     printf("add XX\n");
@@ -57,6 +61,7 @@ int main(int argc, char *argv[])
     printf("add YY\n");
     array_queue_add(&aq, "YY");
     printf("array queue size = %d\n", array_queue_size(&aq));
+    printf("array queue length = %d\n", aq.length);
     array_queue_show(&aq);
 
     printf("remove\n");
@@ -80,6 +85,7 @@ int main(int argc, char *argv[])
     printf("remove\n");
     array_queue_remove(&aq);
     printf("array queue size = %d\n", array_queue_size(&aq));
+    printf("array queue length = %d\n", aq.length);
     array_queue_show(&aq);
 
 
@@ -88,6 +94,13 @@ int main(int argc, char *argv[])
     printf("add 200\n");
     array_queue_add(&aq, "200");
     printf("array queue size = %d\n", array_queue_size(&aq));
+    printf("array queue length = %d\n", aq.length);
+    array_queue_show(&aq);
+
+    printf("add 300\n");
+    array_queue_add(&aq, "300");
+    printf("array queue size = %d\n", array_queue_size(&aq));
+    printf("array queue length = %d\n", aq.length);
     array_queue_show(&aq);
 
     array_queue_free(&aq);
