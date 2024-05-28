@@ -90,6 +90,22 @@ int main(int argc, char *argv[])
     printf("array stack length = %d\n", as.barr.length);
     array_stack_show(&as);
 
+    int i;
+    for (i = 0; i < 9; i ++)
+    {
+        printf("remove offset 0\n");
+        array_stack_remove(&as, 0);
+    }
+    printf("array stack size = %d\n", array_stack_size(&as));
+    printf("array stack length = %d\n", as.barr.length);
+    array_stack_show(&as);
+
+    printf("remove offset 0\n");
+    array_stack_remove(&as, 0);
+    printf("array stack size = %d\n", array_stack_size(&as));
+    printf("array stack length = %d\n", as.barr.length);
+    array_stack_show(&as);
+
     array_stack_free(&as);
 
     return 0;

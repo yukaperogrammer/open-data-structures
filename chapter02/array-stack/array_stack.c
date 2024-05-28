@@ -125,6 +125,13 @@ char *array_stack_remove(array_stack *asp, int offset)
     /* 要素が1つ減ったのでサイズを減らす */
     asp->num_of_element--;
 
+    /* 要素数が少なくなってきたら配列サイズを収縮 */
+    if (3 * asp->num_of_element <= asp->barr.length)
+    {
+        /* 収縮に失敗してもすぐに影響はない */
+        array_stack_resize(asp);
+    }
+
     return retval;
 }
 
@@ -134,23 +141,26 @@ char *array_stack_remove(array_stack *asp, int offset)
 int array_stack_resize(array_stack *asp)
 {
     int i;
+    int size;
     char **tmp;
 
-    /* 2倍の大きさに拡張 */
-    tmp = (char **)xmalloc(asp->barr.array, sizeof(char *) * 2 * asp->barr.length);
+    /* すぐにremoveが呼ばれてしまうと配列サイズが0になってしまうので、最低でも1つの領域は確保 */
+    size = (2 * asp->num_of_element > 1) ? (2 * asp->num_of_element) : 1;
+
+    /* 拡張or収縮 */
+    tmp = (char **)xmalloc(asp->barr.array, sizeof(char *) * size);
     if (tmp == NULL)
     {
         return FALSE;
     }
+    asp->barr.array = tmp;
+    asp->barr.length = size;
 
     /* 一応NULLで初期化しておく */
-    for (i = asp->barr.length; i < 2 * asp->barr.length; i++)
+    for (i = asp->num_of_element; i < asp->barr.length; i++)
     {
-        tmp[i] = NULL;
+        asp->barr.array[i] = NULL;
     }
-
-    asp->barr.array = tmp;
-    asp->barr.length *= 2;
 
     return TRUE;
 }
